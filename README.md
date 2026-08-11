@@ -14,7 +14,7 @@ Wall·E 是一个本地桌面个人助手。两种模式：
 
 | 模式 | 做什么 | 技术 |
 |------|--------|------|
-| **Chat** | 对话、问答、日常协作 | [Vercel AI SDK](https://sdk.vercel.ai/) |
+| **Chat** | 对话、问答、日常协作；消息可能含 Markdown / 图表 | [AI SDK](https://sdk.vercel.ai/) + [Beautiful Mermaid](https://agents.craft.do/mermaid) |
 | **Work** | 写代码、跑命令、改仓库 | [Pi](https://pi.dev/) |
 
 Chat 负责轻量交互；Work 把任务交给 [Pi coding agent](https://pi.dev/)，由它在本地环境里真正执行。
@@ -28,6 +28,7 @@ Chat 负责轻量交互；Work 把任务交给 [Pi coding agent](https://pi.dev/
 | UI | [HeroUI Pro](https://heroui.pro/) |
 | Icons | [LobeHub Icons](https://icons.lobehub.com/)（模型 / 品牌 SVG，按需） |
 | Chat | [AI SDK](https://sdk.vercel.ai/) |
+| Markdown / 图表 | [Beautiful Mermaid](https://agents.craft.do/mermaid)（Chat 内 Mermaid 渲染，按需） |
 | Work | [Pi](https://pi.dev/) |
 
 ## Agent Skills
