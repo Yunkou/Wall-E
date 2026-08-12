@@ -48,6 +48,7 @@ const app_markup_sources = [_]canvas.ui_markup.SourceFile{
     .{ .path = "components/compose-bar.native", .source = @embedFile("components/compose-bar.native") },
     .{ .path = "components/conversation-pane.native", .source = @embedFile("components/conversation-pane.native") },
     .{ .path = "components/review-pane.native", .source = @embedFile("components/review-pane.native") },
+    .{ .path = "components/palette-pane.native", .source = @embedFile("components/palette-pane.native") },
 };
 
 const app_permissions = manifestStringList(manifest, "permissions");

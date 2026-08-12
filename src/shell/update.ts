@@ -28,6 +28,7 @@ export function createInitialModel(): Model {
     colorScheme: "dark",
     reduceMotion: false,
     highContrast: false,
+    showPalette: false,
   };
 }
 
@@ -104,6 +105,8 @@ export function reduce(model: Model, msg: Msg): Model {
       return withThemeMode(model, "dark");
     case "toggle_theme":
       return withThemeMode(model, theme_nextThemeMode(model.themeMode));
+    case "toggle_palette":
+      return { ...model, showPalette: !model.showPalette };
     case "appearance_changed": {
       const system = msg.colorScheme;
       return {

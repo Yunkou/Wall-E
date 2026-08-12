@@ -14,6 +14,7 @@ import type {
   ChromeButtons,
   ChromeInsets,
   ColorScheme,
+  KeyEvent,
 } from "@native-sdk/core/events";
 import type { FileChange, Message, Project, SelectionState, Thread } from "./mock/types.ts";
 import { createInitialModel, reduce } from "./shell/update.ts";
@@ -78,6 +79,8 @@ export interface Model {
   readonly colorScheme: ColorScheme;
   readonly reduceMotion: boolean;
   readonly highContrast: boolean;
+  /** Debug Uber token swatches; toggled by Cmd/Ctrl+Shift+P. */
+  readonly showPalette: boolean;
 }
 
 export type Msg =
@@ -92,6 +95,7 @@ export type Msg =
   | { readonly kind: "set_theme_light" }
   | { readonly kind: "set_theme_dark" }
   | { readonly kind: "toggle_theme" }
+  | { readonly kind: "toggle_palette" }
   | {
       readonly kind: "chrome_changed";
       readonly insets: ChromeInsets;
@@ -114,6 +118,8 @@ export const viewUnbound = [
   "systemScheme",
   "colorScheme",
   "themeMode",
+  "showPalette",
+  "toggle_palette",
   // Consumed by the Uber tokens_fn / theme helpers, not bound as fields.
   "isDark",
   "isLight",
@@ -131,6 +137,15 @@ export function initialModel(): Model {
 
 export function update(model: Model, msg: Msg): Model {
   return reduce(model, msg);
+}
+
+/** App-level key fallback: Cmd/Ctrl+Shift+P toggles the Uber palette pane. */
+export function keyMsg(key: KeyEvent): Msg | null {
+  if (!key.shift) return null;
+  if (key.alt) return null;
+  if (!(key.super || key.control)) return null;
+  if (key.key !== "p") return null;
+  return { kind: "toggle_palette" };
 }
 
 // --- Markup binding helpers (declared here; logic in shell/) ---
@@ -223,4 +238,7 @@ export function schemeLabel(model: Model): Uint8Array {
 }
 export function schemeIcon(model: Model): Uint8Array {
   return theme_schemeIcon(model);
+}
+export function showShell(model: Model): boolean {
+  return !model.showPalette;
 }

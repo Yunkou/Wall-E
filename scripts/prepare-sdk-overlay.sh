@@ -44,8 +44,13 @@ from pathlib import Path
 
 p = Path(sys.argv[1])
 text = p.read_text()
-# Already fully patched (theme + lucide + markup components)
-if "lucide_icons.zig" in text and "uber.zig" in text and "components/titlebar.native" in text:
+# Already fully patched (theme + lucide + markup components including palette)
+if (
+    "lucide_icons.zig" in text
+    and "uber.zig" in text
+    and "components/titlebar.native" in text
+    and "components/palette-pane.native" in text
+):
     print("build/app.zig already stages uber + lucide + markup components")
     raise SystemExit(0)
 
@@ -58,6 +63,7 @@ components = [
     "compose-bar",
     "conversation-pane",
     "review-pane",
+    "palette-pane",
 ]
 component_copies = "".join(
     f'    _ = staged.addCopyFile(b.path(appPath(b, app_root, "src/components/{name}.native")), "components/{name}.native");\n'
@@ -117,7 +123,8 @@ if [[ -L "$DEST/package.json" ]] && [[ "$(readlink "$DEST/package.json")" == "$R
   # Re-copy stock app.zig then re-apply patch when lucide or markup
   # component staging is missing.
   if ! grep -q 'lucide_icons.zig' "$DEST/build/app.zig" 2>/dev/null \
-    || ! grep -q 'components/titlebar.native' "$DEST/build/app.zig" 2>/dev/null; then
+    || ! grep -q 'components/titlebar.native' "$DEST/build/app.zig" 2>/dev/null \
+    || ! grep -q 'components/palette-pane.native' "$DEST/build/app.zig" 2>/dev/null; then
     cp "$REAL/build/app.zig" "$DEST/build/app.zig"
     patch_stage
   fi

@@ -2,6 +2,7 @@
   Wall-E agent shell entry view.
   Layout only: import components, compose three-pane Codex-like shell.
   Logic lives in core.ts + shell/*; mock data in mock/*; never import mock here.
+  Cmd/Ctrl+Shift+P toggles the Uber DesignTokens palette (titlebar stays).
 -->
 <import src="components/titlebar.native"/>
 <import src="components/session-card.native"/>
@@ -11,16 +12,22 @@
 <import src="components/compose-bar.native"/>
 <import src="components/conversation-pane.native"/>
 <import src="components/review-pane.native"/>
+<import src="components/palette-pane.native"/>
 
 <column background="background" grow="1" label="Agent shell">
   <use template="titlebar" />
   <separator />
 
-  <split value="{navSplit}" on-resize="nav_resized" gap="1" grow="1">
-    <use template="session-sidebar" />
-    <split value="{mainSplit}" on-resize="main_resized" gap="1">
-      <use template="conversation-pane" />
-      <use template="review-pane" />
+  <if test="{showShell}">
+    <split value="{navSplit}" on-resize="nav_resized" gap="1" grow="1">
+      <use template="session-sidebar" />
+      <split value="{mainSplit}" on-resize="main_resized" gap="1">
+        <use template="conversation-pane" />
+        <use template="review-pane" />
+      </split>
     </split>
-  </split>
+  </if>
+  <else>
+    <use template="palette-pane" />
+  </else>
 </column>

@@ -1,0 +1,161 @@
+<!-- Debug: Uber DesignTokens swatches (real theme colors). Toggle: Cmd/Ctrl+Shift+P. -->
+<template name="palette-pane">
+  <scroll grow="1" label="Uber palette">
+    <column padding="20" gap="20" background="background">
+      <column gap="4">
+        <text size="heading"><span weight="bold">Uber palette</span></text>
+        <text size="sm" foreground="text_muted">DesignTokens live preview · Cmd/Ctrl+Shift+P to return · use titlebar Auto/Light/Dark</text>
+      </column>
+
+      <column gap="8">
+        <text size="sm"><span weight="bold">Surfaces</span></text>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="background" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">background</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="surface" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">surface</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="surface_subtle" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">surface_subtle</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="surface_pressed" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">surface_pressed</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="disabled" radius="md">
+            <text size="sm" foreground="text_muted"><span weight="medium">disabled</span></text>
+            <text size="sm" foreground="text_muted">Aa contrast</text>
+          </column>
+        </row>
+      </column>
+
+      <column gap="8">
+        <text size="sm"><span weight="bold">Ink</span></text>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="text" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">text</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="text_muted" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">text_muted</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+        </row>
+      </column>
+
+      <column gap="8">
+        <text size="sm"><span weight="bold">Chrome</span></text>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="border" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">border</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="focus_ring" radius="md">
+            <text size="sm" foreground="accent_text"><span weight="medium">focus_ring</span></text>
+            <text size="sm" foreground="accent_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="shadow" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">shadow</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="scrim" radius="md">
+            <text size="sm" foreground="text"><span weight="medium">scrim</span></text>
+            <text size="sm" foreground="text">Aa contrast</text>
+          </column>
+        </row>
+      </column>
+
+      <column gap="8">
+        <text size="sm"><span weight="bold">Accent / status</span></text>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="accent" radius="md">
+            <text size="sm" foreground="accent_text"><span weight="medium">accent</span></text>
+            <text size="sm" foreground="accent_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="accent_text" radius="md">
+            <text size="sm" foreground="accent"><span weight="medium">accent_text</span></text>
+            <text size="sm" foreground="accent">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="info" radius="md">
+            <text size="sm" foreground="info_text"><span weight="medium">info</span></text>
+            <text size="sm" foreground="info_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="info_text" radius="md">
+            <text size="sm" foreground="info"><span weight="medium">info_text</span></text>
+            <text size="sm" foreground="info">Aa contrast</text>
+          </column>
+        </row>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="destructive" radius="md">
+            <text size="sm" foreground="destructive_text"><span weight="medium">destructive</span></text>
+            <text size="sm" foreground="destructive_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="destructive_text" radius="md">
+            <text size="sm" foreground="destructive"><span weight="medium">destructive_text</span></text>
+            <text size="sm" foreground="destructive">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="success" radius="md">
+            <text size="sm" foreground="success_text"><span weight="medium">success</span></text>
+            <text size="sm" foreground="success_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="success_text" radius="md">
+            <text size="sm" foreground="success"><span weight="medium">success_text</span></text>
+            <text size="sm" foreground="success">Aa contrast</text>
+          </column>
+        </row>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="warning" radius="md">
+            <text size="sm" foreground="warning_text"><span weight="medium">warning</span></text>
+            <text size="sm" foreground="warning_text">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="warning_text" radius="md">
+            <text size="sm" foreground="warning"><span weight="medium">warning_text</span></text>
+            <text size="sm" foreground="warning">Aa contrast</text>
+          </column>
+        </row>
+      </column>
+
+      <column gap="8">
+        <text size="sm"><span weight="bold">Syntax</span></text>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="syntax_plain" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_plain</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="syntax_comment" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_comment</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="syntax_keyword" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_keyword</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="syntax_literal" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_literal</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+        </row>
+        <row gap="8">
+          <column width="148" height="76" padding="10" gap="4" background="syntax_function" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_function</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="syntax_property" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_property</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+          <column width="148" height="76" padding="10" gap="4" background="syntax_constant" radius="md">
+            <text size="sm" foreground="background"><span weight="medium">syntax_constant</span></text>
+            <text size="sm" foreground="background">Aa contrast</text>
+          </column>
+        </row>
+      </column>
+
+      <spacer height="24" />
+    </column>
+  </scroll>
+</template>
