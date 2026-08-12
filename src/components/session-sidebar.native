@@ -1,0 +1,36 @@
+<!-- Left pane: projects + sessions for the selected project. -->
+<import src="session-card.native"/>
+<template name="session-sidebar">
+  <column min-width="200" background="surface" label="Sessions sidebar">
+    <column padding="12" gap="4">
+      <text size="sm" foreground="text_muted">PROJECTS</text>
+      <text size="sm" foreground="text_muted">Select a project, then a session</text>
+    </column>
+    <separator />
+    <scroll grow="1" label="Project and session list">
+      <column padding="8" gap="6">
+        <for each="projects" as="p" key="id">
+          <list-item
+            icon="app:folder"
+            selected="{p.id == selection.projectId}"
+            on-press="select_project:{p.id}"
+            label="{p.name}"
+          >{p.name}</list-item>
+        </for>
+
+        <row padding="4" cross="center">
+          <text size="sm" foreground="text_muted" grow="1">SESSIONS</text>
+        </row>
+
+        <for each="projectThreads" as="t" key="id">
+          <use template="session-card" id="{t.id}" title="{t.title}" status="{t.statusLabel}" />
+        </for>
+      </column>
+    </scroll>
+    <separator />
+    <column padding="10" gap="4">
+      <text size="sm" foreground="text_muted">Local mock data</text>
+      <text size="sm" foreground="text_muted">faker fixtures · no live AI</text>
+    </column>
+  </column>
+</template>

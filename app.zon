@@ -1,24 +1,42 @@
 .{
     .id = "dev.native_sdk.wall-e",
     .name = "wall-e",
-    .display_name = "Wall E",
-    .description = "A counter that lives in one native window.",
+    .display_name = "Wall-E",
+    .description = "Local personal agent shell: Chat and Work sessions, mock Codex-like multi-pane UI.",
     .version = "0.1.0",
     .icons = .{"assets/icon.png"},
     .platforms = .{"macos"},
     .permissions = .{ "view", "command" },
     .capabilities = .{ "native_views", "gpu_surfaces" },
+    // app.zon only accepts house|geist; live palette is Uber DesignTokens
+    // via tokens_fn (src/theme/uber.zig + ts_core_main.zig).
+    .theme = "geist",
     .shell = .{
         .windows = .{
             .{
                 .label = "main",
-                .title = "Wall E",
-                .width = 480,
-                .height = 320,
+                .title = "Wall-E",
+                .width = 1320,
+                .height = 860,
+                .min_width = 960,
+                .min_height = 640,
                 .restore_state = false,
                 .restore_policy = "center_on_primary",
+                .titlebar = "hidden_inset_tall",
                 .views = .{
-                    .{ .label = "main-canvas", .kind = "gpu_surface", .fill = true, .role = "Counter canvas", .accessibility_label = "Counter", .gpu_backend = "metal", .gpu_pixel_format = "bgra8_unorm", .gpu_present_mode = "timer", .gpu_alpha_mode = "opaque", .gpu_color_space = "srgb", .gpu_vsync = true },
+                    .{
+                        .label = "shell-canvas",
+                        .kind = "gpu_surface",
+                        .fill = true,
+                        .role = "Agent shell",
+                        .accessibility_label = "Wall-E agent sessions, conversation, and review",
+                        .gpu_backend = "metal",
+                        .gpu_pixel_format = "bgra8_unorm",
+                        .gpu_present_mode = "timer",
+                        .gpu_alpha_mode = "opaque",
+                        .gpu_color_space = "srgb",
+                        .gpu_vsync = true,
+                    },
                 },
             },
         },

@@ -8,89 +8,96 @@
   从零开始的桌面个人 Agent：陪你聊天，也帮你干活。
 </p>
 
+> **协作入口**：接手开发或给 AI 续作请先读 [HANDOFF.md](./HANDOFF.md)（架构、overlay、踩坑、下一步）。
+
 ## 这是什么
 
-Wall·E 是一个本地桌面个人助手。两种模式：
+Wall·E 是一个 **Native SDK** 本地桌面个人助手。两种模式：
 
-| 模式 | 做什么 | 技术 |
-|------|--------|------|
-| **Chat** | 对话、问答、日常协作；消息可能含 Markdown / 图表 | [AI SDK](https://sdk.vercel.ai/) + [Beautiful Mermaid](https://agents.craft.do/mermaid) |
+| 模式 | 做什么 | 技术（规划） |
+|------|--------|----------------|
+| **Chat** | 对话、问答、日常协作；消息可能含 Markdown / 图表 | [AI SDK](https://sdk.vercel.ai/) |
 | **Work** | 写代码、跑命令、改仓库 | [Pi](https://pi.dev/) |
 
-Chat 负责轻量交互；Work 把任务交给 [Pi coding agent](https://pi.dev/)，由它在本地环境里真正执行。
+当前仓库已落地 **Codex 风格多栏 Agent shell**（mock 数据）；Chat / Work 后端尚未接入。
 
 ## 技术栈
 
 | 层 | 选型 |
 |----|------|
-| 客户端 | [Native SDK](https://native-sdk.dev/)（原生桌面窗口，非 WebView） |
-| 运行时 | [Bun](https://bun.sh/) |
-| UI | [HeroUI Pro](https://heroui.pro/) |
-| Icons | [LobeHub Icons](https://icons.lobehub.com/)（模型 / 品牌 SVG，按需） |
-| Chat | [AI SDK](https://sdk.vercel.ai/) |
-| Markdown / 图表 | [Beautiful Mermaid](https://agents.craft.do/mermaid)（Chat 内 Mermaid 渲染，按需） |
-| Work | [Pi](https://pi.dev/) |
+| 客户端 | [Native SDK](https://native-sdk.dev/)（原生窗口，无 WebView / 无 JS 运行时） |
+| 逻辑 | TypeScript app core（`src/core.ts` → 编译为原生） |
+| UI | Native markup（`.native`）+ `src/components/` |
+| 主题 | `src/theme/uber.zig`（DesignTokens + `tokens_fn`） |
+| 图标 | [Lucide Static](https://lucide.dev/guide/static/) → `app:<name>` |
+| Mock | `@faker-js/faker` 仅用于生成 `src/mock/fixtures.ts` |
 
 ## 目录结构
 
-脚手架由 [Native SDK CLI](https://www.npmjs.com/package/@native-sdk/cli) 在仓库根目录就地生成（`native init .`），未拆 monorepo：
-
 ```
 .
-├── app.zon          # 应用清单：窗口、权限、图标、能力
-├── package.json     # 仅给编辑器/TS 用，CLI 不读、不参与构建
-├── tsconfig.json    # 与内置 checker 同选项，编辑器诊断 = `native check` 结果
+├── app.zon                    # 清单：窗口、权限、包名
+├── build.zig / build.zig.zon  # ejected 构建（Uber + Lucide launcher）
+├── package.json               # 编辑器 / mock / 图标脚本（CLI 不依赖它）
+├── scripts/
+│   ├── generate-mock.mjs      # faker → fixtures
+│   ├── sync-lucide-icons.mjs  # lucide-static → registry
+│   └── prepare-sdk-overlay.sh # 本地 SDK overlay
 ├── src/
-│   ├── app.native   # 视图：声明式 markup，绑定 Model 字段
-│   └── core.ts      # 逻辑：Model / Msg / update，纯 TS，编译期到原生
-├── assets/
-│   ├── logo.jpg     # 项目品牌图
-│   └── icon.png     # 应用图标（Native SDK 使用）
-└── .gitignore       # 忽略 .native/、zig-out/、.zig-cache/、node_modules/
+│   ├── app.native             # 入口视图
+│   ├── core.ts                # Model / Msg / update
+│   ├── components/            # markup 组件
+│   ├── shell/                 # 纯逻辑（select / theme / update）
+│   ├── mock/                  # fixtures + selection
+│   └── theme/
+│       ├── uber.zig           # DesignTokens
+│       ├── lucide_icons.zig   # Lucide 注册表（生成）
+│       └── ts_core_main.zig   # launcher：tokens_fn + icons
+└── assets/
+    ├── icon.png
+    ├── logo.jpg
+    └── icons/                 # 同步后的 Lucide SVG 对照
 ```
-
-> TypeScript 前端与 core 编译器在构建期跑，发布后的二进制里**没有** JS 运行时。
 
 ## 开发循环
 
-先决条件：[Node.js](https://nodejs.org/) ≥ 22.15（CLI 与 core checker 需要），
-[Zig](https://ziglang.org/) ≥ 0.14（`native build` 编译原生二进制；不在 PATH 时 `native dev` 会给出安装指引）。
+先决条件：Node.js ≥ 22.15，Zig ≥ 0.14（或由 `native` CLI 提示安装）。
 
 ```sh
-# 安装 CLI（如未安装）
 npm install -g @native-sdk/cli
+npm install
 
-# 1) 编辑 src/core.ts → 改 Model/Msg/update
-# 2) 编辑 src/app.native → 改视图绑定
-# 3) 编辑 app.zon → 改窗口/权限/图标
-
-native check        # 验证 core.ts (subset) + 全部 *.native + app.zon，毫秒级
-native dev --core   # 在 node 里跑 core 循环，JSON 行派发 Msg，最快的逻辑验证
-native dev          # 构建 Debug 二进制并启动原生窗口（markup 热重载）
-native build        # ReleaseFast 二进制 → zig-out/bin/wall-e
-native test         # 跑应用自带测试集
+native check        # core subset + markup + app.zon
+native dev --core   # 逻辑环（JSON 派发 Msg）
+native dev          # Debug 原生窗口
+native build        # Release → zig-out/bin/wall-e
+native test
+npm test            # mock selection 单测
 ```
 
+### 图标
 
-## Scaffold 出处
+```sh
+npm run sync:icons   # 按 scripts/sync-lucide-icons.mjs 列表生成注册表
+```
 
-`src/app.native` 与 `src/core.ts` 默认是 **counter / tick / stamp** 三件套示例（来自
-`native init`），用来验证脚手架能跑通；后续会把 `app.native` 改成真正承载 Chat 与
-Work 两个面板的桌面壳，core 换成接 AI SDK / Pi 的状态机。
+Markup：`app:folder`、`icon="app:send"`（见 [Lucide icons](https://lucide.dev/icons/)）。
+
+### Mock 数据
+
+```sh
+node scripts/generate-mock.mjs
+```
 
 ## Agent Skills
 
-开发时给 coding agent 用，按职责归类。HeroUI 相关见 [Agent Skills](https://heroui.pro/docs/react/getting-started/agent-skills)。
-
-| 类别 | Skill | 作用 |
-|------|-------|------|
-| **组件选型** | [`heroui-react-pro`](https://heroui.pro/docs/react/getting-started/agent-skills) | 按场景选对 `@heroui-pro/react` 组件，遵循 v3 用法 |
-| **组件美感** | [`heroui-pro-design-taste`](https://heroui.pro/docs/react/getting-started/agent-skills) | 间距、字体、色彩、卡片与表单等设计原则，提升观感 |
-| **界面设计** | [Impeccable](https://impeccable.style/) | 辅助客户端整体视觉，去 AI 默认审美 |
-
-## 状态
-
-仓库已铺好 Native SDK 脚手架（counter 占位逻辑 + 单窗口）。
+```sh
+npx skills add vercel-labs/native   # 已装则跳过
+native skills list
+native skills get core
+native skills get native-ui
+native skills get ts-core
+```
 
 ## License
 

@@ -1,0 +1,43 @@
+<!-- Center pane: session header + messages + compose. -->
+<import src="message-user.native"/>
+<import src="message-assistant.native"/>
+<import src="compose-bar.native"/>
+<template name="conversation-pane">
+  <column min-width="320" background="background" label="Conversation">
+    <row padding="12" cross="center" gap="8" background="surface">
+      <column grow="1" gap="2">
+        <text size="sm" overflow="ellipsis">{threadTitle}</text>
+        <text size="sm" foreground="text_muted">{messageCount} messages · {fileCount} files changed</text>
+      </column>
+      <if test="{hasThreadStatus}">
+        <badge size="sm" variant="secondary">{threadStatusLabel}</badge>
+      </if>
+    </row>
+    <separator />
+
+    <if test="{hasThread}">
+      <scroll grow="1" label="Message thread">
+        <column padding="20" gap="16" max-width="760">
+          <for each="messages" as="m" key="id">
+            <if test="{m.isUser}">
+              <use template="message-user" id="{m.id}" content="{m.content}" />
+            </if>
+            <else>
+              <use template="message-assistant" id="{m.id}" content="{m.content}" toolcount="{m.toolCount}" />
+            </else>
+          </for>
+          <spacer height="24" />
+        </column>
+      </scroll>
+    </if>
+    <else>
+      <column grow="1" main="center" cross="center" padding="32" gap="8" label="Empty session">
+        <text size="heading" text-alignment="center"><span weight="bold">What should we work on?</span></text>
+        <text size="sm" foreground="text_muted" text-alignment="center">Pick a project and session on the left to open a mock agent thread.</text>
+      </column>
+    </else>
+
+    <separator />
+    <use template="compose-bar" />
+  </column>
+</template>

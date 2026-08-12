@@ -1,0 +1,12 @@
+<!-- Assistant turn: badge + body + optional tool count. -->
+<template name="message-assistant" args="id content toolcount">
+  <column key="{id}" gap="8" label="Assistant turn">
+    <row gap="8" cross="center">
+      <badge size="sm" variant="secondary">assistant</badge>
+      <if test="{toolcount > 0}">
+        <text size="sm" foreground="text_muted">{toolcount} tools</text>
+      </if>
+    </row>
+    <text wrap="true">{content}</text>
+  </column>
+</template>

@@ -3,6 +3,20 @@
   "private": true,
   "description": "Editor and versioning surface only: stock TypeScript tooling resolves @native-sdk/core from here. The native CLI never reads it and builds with node_modules absent.",
   "dependencies": {
-    "@native-sdk/core": "0.8.4"
+    "@native-sdk/core": "0.8.4",
+    "lucide-static": "^1.31.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.5.0",
+    "vitest": "^4.1.10"
+  },
+  "type": "module",
+  "scripts": {
+    "generate:mock": "node scripts/generate-mock.mjs",
+    "sync:icons": "node scripts/sync-lucide-icons.mjs",
+    "test": "vitest run",
+    "check": "native check",
+    "dev": "native dev",
+    "dev:core": "native dev --core"
   }
 }

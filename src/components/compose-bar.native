@@ -1,0 +1,19 @@
+<!-- Bottom task composer. -->
+<template name="compose-bar">
+  <column padding="12" gap="8" background="surface" label="Composer">
+    <input-group grow="1" height="88" label="Task prompt">
+      <textarea
+        text="{draftText}"
+        placeholder="Describe a task for Wall-E… (mock, no live agent)"
+        submit-on-enter="true"
+        on-input="draft_edit"
+        on-submit="compose_submit"
+        label="Compose message"
+      />
+      <input-group-actions>
+        <button size="sm" variant="primary" icon="app:arrow-up" on-press="compose_submit" label="Send task"></button>
+      </input-group-actions>
+    </input-group>
+    <text size="sm" foreground="text_muted">Mock shell · selecting sessions updates conversation and review panes</text>
+  </column>
+</template>

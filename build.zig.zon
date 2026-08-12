@@ -1,0 +1,10 @@
+.{
+    .name = .wall_e,
+    .fingerprint = 0x33716c945a707070,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.16.0",
+    // Project-local SDK overlay: mostly symlinks + Uber launcher / theme.
+    // Create or refresh with `bash scripts/prepare-sdk-overlay.sh` (also run from build.zig).
+    .dependencies = .{ .native_sdk = .{ .path = ".native/sdk-overlay" } },
+    .paths = .{ "build.zig", "build.zig.zon", "src", "assets", "app.zon", "scripts" },
+}

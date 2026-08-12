@@ -1,0 +1,9 @@
+<!-- Right-aligned user bubble. -->
+<template name="message-user" args="id content">
+  <row key="{id}" gap="10" label="User turn">
+    <spacer grow="1" min-width="80" />
+    <bubble variant="primary">
+      <text wrap="true">{content}</text>
+    </bubble>
+  </row>
+</template>

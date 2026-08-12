@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "native-sdk": {
+      "source": "vercel-labs/native",
+      "sourceType": "github",
+      "skillPath": "skills/native-sdk/SKILL.md",
+      "computedHash": "b01501f5e7af0df9b8c4ebb1ccb51f1bad1af298a6a281a7d56af64aff1cf887"
+    }
+  }
+}

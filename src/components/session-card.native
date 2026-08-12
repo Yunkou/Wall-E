@@ -1,0 +1,17 @@
+<!-- One agent session row in the sidebar. -->
+<template name="session-card" args="id title status">
+  <panel
+    padding="8"
+    radius="md"
+    background="background"
+    on-press="select_thread:{id}"
+    label="{title}"
+  >
+    <column gap="4">
+      <text size="sm" overflow="ellipsis">{title}</text>
+      <row gap="6" cross="center">
+        <badge size="sm" variant="secondary">{status}</badge>
+      </row>
+    </column>
+  </panel>
+</template>

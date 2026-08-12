@@ -1,0 +1,56 @@
+<!-- Right pane: changed files + diff viewer. -->
+<template name="review-pane">
+  <column min-width="260" background="surface" label="Review pane">
+    <row padding="12" cross="center" gap="8">
+      <text size="sm" grow="1"><span weight="bold">Review</span></text>
+      <text size="sm" foreground="text_muted">{fileCount} files</text>
+    </row>
+    <separator />
+
+    <if test="{hasFiles}">
+      <column padding="8" gap="2">
+        <text size="sm" foreground="text_muted">Changed files</text>
+      </column>
+      <scroll height="180" label="File change list">
+        <column padding="6" gap="2">
+          <for each="files" as="f" key="id">
+            <list-item
+              icon="app:file-text"
+              size="sm"
+              selected="{f.id == selection.fileId}"
+              on-press="select_file:{f.id}"
+              label="{f.path}"
+            >{f.path}</list-item>
+          </for>
+        </column>
+      </scroll>
+      <separator />
+      <if test="{hasSelectedFile}">
+        <column grow="1" padding="10" gap="8" label="Diff viewer">
+          <row gap="8" cross="center">
+            <text size="sm" overflow="ellipsis" grow="1">{filePath}</text>
+            <text size="sm" foreground="success">{additionsLabel}</text>
+            <text size="sm" foreground="destructive">{deletionsLabel}</text>
+          </row>
+          <scroll grow="1">
+            <panel padding="10" background="background" radius="md">
+              <code source="{fileDiff}" language="plain" wrap="false" line-numbers="true" />
+            </panel>
+          </scroll>
+        </column>
+      </if>
+      <else>
+        <column grow="1" main="center" cross="center" padding="16">
+          <text size="sm" foreground="text_muted">Select a changed file</text>
+        </column>
+      </else>
+    </if>
+    <else>
+      <column grow="1" main="center" cross="center" padding="20" gap="6" label="No diffs">
+        <icon name="git-branch" width="20" height="20" foreground="text_muted" />
+        <text size="sm" foreground="text_muted" text-alignment="center">No file changes in this session</text>
+        <text size="sm" foreground="text_muted" text-alignment="center">Pick a session marked Review or Done</text>
+      </column>
+    </else>
+  </column>
+</template>

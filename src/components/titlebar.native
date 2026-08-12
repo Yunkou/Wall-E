@@ -1,0 +1,22 @@
+<!-- App titlebar: brand, session crumb, theme controls. -->
+<template name="titlebar">
+  <row height="{headerHeight}" padding="10" cross="center" gap="8" window-drag="true" label="Titlebar">
+    <spacer width="{chromeLeading}" />
+    <icon name="app:terminal" width="16" height="16" foreground="text_muted" />
+    <text size="sm"><span weight="bold">Wall-E</span></text>
+    <text size="sm" foreground="text_muted">Agent</text>
+    <separator />
+    <text size="sm" overflow="ellipsis" grow="1">{projectName} / {threadTitle}</text>
+    <if test="{hasThreadStatus}">
+      <badge size="sm" variant="secondary">{threadStatusLabel}</badge>
+    </if>
+    <toggle-group gap="2" label="Appearance">
+      <toggle-button size="sm" icon="app:monitor" selected="{isThemeSystem}" on-toggle="set_theme_system" label="Auto theme">Auto</toggle-button>
+      <toggle-button size="sm" icon="app:sun" selected="{isThemeLight}" on-toggle="set_theme_light" label="Light theme">Light</toggle-button>
+      <toggle-button size="sm" icon="app:moon" selected="{isThemeDark}" on-toggle="set_theme_dark" label="Dark theme">Dark</toggle-button>
+    </toggle-group>
+    <button size="icon" variant="ghost" icon="{schemeIcon}" on-press="toggle_theme" label="Cycle theme"></button>
+    <text size="sm" foreground="text_muted">{schemeLabel}</text>
+    <badge size="sm" variant="secondary">mock</badge>
+  </row>
+</template>
