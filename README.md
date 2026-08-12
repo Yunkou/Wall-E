@@ -71,12 +71,6 @@ native build        # ReleaseFast 二进制 → zig-out/bin/wall-e
 native test         # 跑应用自带测试集
 ```
 
-跑一次核心循环的样例：
-
-```sh
-printf '%s\n' '{"kind":"increment"}' '{"kind":"toggle_ticking"}' '{"advance":3000}' \
-  | native dev --core
-```
 
 ## Scaffold 出处
 
@@ -96,8 +90,7 @@ Work 两个面板的桌面壳，core 换成接 AI SDK / Pi 的状态机。
 
 ## 状态
 
-仓库已铺好 Native SDK 脚手架（counter 占位逻辑 + 单窗口）。当前 Node 环境是 v22.11.0，
-低于 Native SDK 的 22.15 要求；升级后再 `native check` / `native dev` 验证骨架。
+仓库已铺好 Native SDK 脚手架（counter 占位逻辑 + 单窗口）。
 
 ## License
 
