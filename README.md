@@ -8,11 +8,11 @@
   从零开始的桌面个人 Agent：陪你聊天，也帮你干活。
 </p>
 
-> **协作入口**：接手开发或给 AI 续作请先读 [HANDOFF.md](./HANDOFF.md)（架构、overlay、踩坑、下一步）。
+> **协作入口**：接手开发或给 AI 续作请先读 [HANDOFF.md](./HANDOFF.md)（架构、踩坑、下一步）。
 
 ## 这是什么
 
-Wall·E 是一个 **Native SDK** 本地桌面个人助手。两种模式：
+Wall·E 是一个 **Electron + React + TypeScript** 本地桌面个人助手。两种模式：
 
 | 模式 | 做什么 | 技术（规划） |
 |------|--------|----------------|
@@ -25,78 +25,76 @@ Wall·E 是一个 **Native SDK** 本地桌面个人助手。两种模式：
 
 | 层 | 选型 |
 |----|------|
-| 客户端 | [Native SDK](https://native-sdk.dev/)（原生窗口，无 WebView / 无 JS 运行时） |
-| 逻辑 | TypeScript app core（`src/core.ts` → 编译为原生） |
-| UI | Native markup（`.native`）+ `src/components/` |
-| 主题 | `src/theme/uber.zig`（DesignTokens + `tokens_fn`） |
-| 图标 | [Lucide Static](https://lucide.dev/guide/static/) → `app:<name>` |
+| 客户端 | [Electron](https://www.electronjs.org/) 桌面壳 |
+| UI | React 19 + TypeScript + [HeroUI](https://heroui.com/) / [HeroUI Pro](https://heroui.pro/) |
+| 主题 | 自定义 **Uber**（`src/renderer/themes/uber.css`，`data-theme="uber" \| "uber-dark"`） |
+| 微交互 | [GSAP](https://gsap.com/) + `@gsap/react` |
+| 构建 | Vite + Tailwind CSS v4 + `vite-plugin-electron` |
+| 逻辑 | 纯 TS domain（`src/shell/*`、`src/mock/*`、`src/core.ts`） |
+| 图标 | [lucide-react](https://lucide.dev/) |
 | Mock | `@faker-js/faker` 仅用于生成 `src/mock/fixtures.ts` |
+
+> 历史 Native SDK（`.native` / Zig）产物若仍在仓库中，**不再是**开发与启动主路径。
+
+### Agent skills（设计 / 动效）
+
+| Skill | 用途 |
+|-------|------|
+| `heroui-react-pro` / `heroui-pro-design-taste` | HeroUI 组件与设计品味 |
+| `impeccable` | 界面设计 critique / polish（`npx impeccable install`） |
+| `gsap-*` | GSAP 微交互（`npx skills add https://github.com/greensock/gsap-skills`） |
+
+项目内见 `.agents/skills/`。HeroUI Pro 包安装需已登录：`npx heroui-pro login`（**勿**把 personal token 写进仓库）。
 
 ## 目录结构
 
 ```
 .
-├── app.zon                    # 清单：窗口、权限、包名
-├── build.zig / build.zig.zon  # ejected 构建（Uber + Lucide launcher）
-├── package.json               # 编辑器 / mock / 图标脚本（CLI 不依赖它）
+├── electron/                  # Electron main + preload
+├── index.html                 # Renderer 入口 HTML
+├── package.json
+├── vite.config.ts
 ├── scripts/
-│   ├── generate-mock.mjs      # faker → fixtures
-│   ├── sync-lucide-icons.mjs  # lucide-static → registry
-│   └── prepare-sdk-overlay.sh # 本地 SDK overlay
+│   └── generate-mock.mjs      # faker → fixtures
 ├── src/
-│   ├── app.native             # 入口视图
-│   ├── core.ts                # Model / Msg / update
-│   ├── components/            # markup 组件
-│   ├── shell/                 # 纯逻辑（select / theme / update）
+│   ├── core.ts                # Domain 对外 surface
+│   ├── shell/                 # 纯逻辑（reduce / selectors / theme / composer）
 │   ├── mock/                  # fixtures + selection
-│   └── theme/
-│       ├── uber.zig           # DesignTokens
-│       ├── lucide_icons.zig   # Lucide 注册表（生成）
-│       └── ts_core_main.zig   # launcher：tokens_fn + icons
+│   └── renderer/              # React UI（三栏 shell）
 └── assets/
     ├── icon.png
-    ├── logo.jpg
-    └── icons/                 # 同步后的 Lucide SVG 对照
+    └── logo.jpg
 ```
 
 ## 开发循环
 
-先决条件：Node.js ≥ 22.15，Zig ≥ 0.14（或由 `native` CLI 提示安装）。
+先决条件：**Node.js ≥ 20**（推荐 22+）。**不需要** Zig、`native` CLI 或 `@native-sdk/*`。  
+包管理推荐 **pnpm**（HeroUI Pro CLI 会用它装 peer deps）；`npm` 亦可。
 
 ```sh
-npm install -g @native-sdk/cli
-npm install
+pnpm install      # 或 npm install
+# 首次或换机装 HeroUI Pro 制品（需已 heroui-pro login）：
+npx heroui-pro install --yes
 
-native check        # core subset + markup + app.zon
-native dev --core   # 逻辑环（JSON 派发 Msg）
-native dev          # Debug 原生窗口
-native build        # Release → zig-out/bin/wall-e
-native test
-npm test            # mock selection 单测
+pnpm dev          # Vite + Electron 开发窗口
+pnpm start        # 启动已构建的 Electron 应用（需先 build）
+pnpm build        # 构建 renderer + electron 主进程
+pnpm test         # vitest：selection + reduce 纯逻辑单测
+pnpm typecheck    # TypeScript 检查
 ```
-
-### 图标
-
-```sh
-npm run sync:icons   # 按 scripts/sync-lucide-icons.mjs 列表生成注册表
-```
-
-Markup：`app:folder`、`icon="app:send"`（见 [Lucide icons](https://lucide.dev/icons/)）。
 
 ### Mock 数据
 
 ```sh
-node scripts/generate-mock.mjs
+npm run generate:mock   # 或 node scripts/generate-mock.mjs
 ```
 
-## Agent Skills
+## 验证
 
 ```sh
-npx skills add vercel-labs/native   # 已装则跳过
-native skills list
-native skills get core
-native skills get native-ui
-native skills get ts-core
+npm test          # 必须绿：exercises shipped selection + reduce
+npm run build     # 必须成功：产出 dist/ + dist-electron/
+npm run dev       # 打开多栏 mock shell
 ```
 
 ## License

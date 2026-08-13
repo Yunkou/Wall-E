@@ -1,5 +1,5 @@
 // Pure selection / query helpers over the workspace.
-// Used by core.ts update + unit tests. Views never import this module.
+// Used by shell/update + unit tests. Views never import this module.
 
 import type {
   FileChange,
@@ -8,13 +8,12 @@ import type {
   SelectionState,
   Thread,
   Workspace,
-} from "./types.ts";
+} from "./types";
 
-/** Sentinel id for "nothing selected" (literal 0 for integer proofs). */
+/** Sentinel id for "nothing selected". */
 export const NONE = 0;
 
 function sel(projectId: number, threadId: number, fileId: number): SelectionState {
-  // Integer slots require a comparison + Math.trunc proof (SC4022).
   return {
     projectId:
       projectId >= 0 && projectId <= 9007199254740991 ? Math.trunc(projectId) : 0,
@@ -107,11 +106,28 @@ export function threadFiles(
   return thread.fileChanges;
 }
 
+/**
+ * Prefer a thread that already has messages + file changes so the conversation
+ * and review panes light up when switching projects (Codex-like first paint).
+ */
+function preferredThread(project: Project): Thread | null {
+  if (project.threads.length === 0) return null;
+  for (let i = 0; i < project.threads.length; i++) {
+    const t = project.threads[i];
+    if (t.messages.length > 0 && t.fileChanges.length > 0) return t;
+  }
+  for (let i = 0; i < project.threads.length; i++) {
+    const t = project.threads[i];
+    if (t.messages.length > 0) return t;
+  }
+  return project.threads[0];
+}
+
 export function selectProject(workspace: Workspace, projectId: number): SelectionState {
   const project = findProject(workspace, projectId);
   if (project === null) return sel(0, 0, 0);
-  if (project.threads.length === 0) return sel(project.id, 0, 0);
-  const thread = project.threads[0];
+  const thread = preferredThread(project);
+  if (thread === null) return sel(project.id, 0, 0);
   if (thread.fileChanges.length === 0) return sel(project.id, thread.id, 0);
   const file = thread.fileChanges[0];
   return sel(project.id, thread.id, file.id);

@@ -1,16 +1,16 @@
-// Pure Model transition — called only from core.ts update.
+// Pure Model transition — host-agnostic reducer.
 
 import {
   selectFile as selFile,
   selectProject as selProject,
   selectThread as selThread,
   defaultSelection,
-} from "../mock/selection.ts";
-import { MOCK_PROJECTS } from "../mock/fixtures.ts";
-import type { Model, Msg, ThemeMode } from "../core.ts";
-import { emptyComposerDraft } from "./model.ts";
-import { applyComposerEvent } from "./composer.ts";
-import { theme_effectiveScheme, theme_nextThemeMode } from "./theme.ts";
+} from "../mock/selection";
+import { MOCK_PROJECTS } from "../mock/fixtures";
+import type { Model, Msg, ThemeMode } from "./model";
+import { emptyComposerDraft } from "./model";
+import { applyComposerText } from "./composer";
+import { theme_effectiveScheme, theme_nextThemeMode } from "./theme";
 
 export function createInitialModel(): Model {
   const projects = MOCK_PROJECTS;
@@ -20,15 +20,11 @@ export function createInitialModel(): Model {
     draft: emptyComposerDraft(),
     navSplit: 0.24,
     mainSplit: 0.58,
-    chromeLeading: 78,
-    chromeTop: 52,
-    headerHeight: 52,
     themeMode: "system",
     systemScheme: "dark",
     colorScheme: "dark",
     reduceMotion: false,
     highContrast: false,
-    showPalette: false,
   };
 }
 
@@ -67,7 +63,7 @@ export function reduce(model: Model, msg: Msg): Model {
         ),
       };
     case "draft_edit":
-      return { ...model, draft: applyComposerEvent(model.draft, msg.text) };
+      return { ...model, draft: applyComposerText(model.draft, msg.text) };
     case "compose_submit":
       return { ...model, draft: emptyComposerDraft() };
     case "nav_resized":
@@ -80,23 +76,6 @@ export function reduce(model: Model, msg: Msg): Model {
         ...model,
         mainSplit: msg.fraction > 0.35 && msg.fraction < 0.85 ? msg.fraction : model.mainSplit,
       };
-    case "chrome_changed": {
-      const leading =
-        msg.insets.left >= 0 && msg.insets.left <= 240
-          ? Math.trunc(msg.insets.left)
-          : model.chromeLeading;
-      const top =
-        msg.insets.top >= 0 && msg.insets.top <= 120
-          ? Math.trunc(msg.insets.top)
-          : model.chromeTop;
-      const header = top > 52 ? top : 52;
-      return {
-        ...model,
-        chromeLeading: leading,
-        chromeTop: top,
-        headerHeight: header >= 0 && header <= 120 ? Math.trunc(header) : 52,
-      };
-    }
     case "set_theme_system":
       return withThemeMode(model, "system");
     case "set_theme_light":
@@ -105,8 +84,6 @@ export function reduce(model: Model, msg: Msg): Model {
       return withThemeMode(model, "dark");
     case "toggle_theme":
       return withThemeMode(model, theme_nextThemeMode(model.themeMode));
-    case "toggle_palette":
-      return { ...model, showPalette: !model.showPalette };
     case "appearance_changed": {
       const system = msg.colorScheme;
       return {

@@ -1,7 +1,5 @@
 // Derived shell data — pure queries over Model.
-// Binding helpers in core.ts wrap these so markup can bind by name.
 
-import { asciiBytes } from "@native-sdk/core";
 import {
   findFile,
   findProject,
@@ -9,9 +7,9 @@ import {
   threadFiles,
   threadMessages,
   NONE,
-} from "../mock/selection.ts";
-import type { FileChange, Message, Project, Thread } from "../mock/types.ts";
-import type { Model } from "../core.ts";
+} from "../mock/selection";
+import type { FileChange, Message, Project, Thread } from "../mock/types";
+import type { Model } from "./model";
 
 function workspace(model: Model): { projects: readonly Project[] } {
   return { projects: model.projects };
@@ -63,37 +61,28 @@ export function query_hasSelectedFile(model: Model): boolean {
   return model.selection.fileId !== NONE;
 }
 
-export function query_hasThreadStatus(model: Model): boolean {
-  return model.selection.threadId !== NONE;
-}
-
-export function query_threadTitle(model: Model): Uint8Array {
+export function query_threadTitle(model: Model): string {
   const t = query_selectedThread(model);
-  return t ? t.title : asciiBytes("No thread");
+  return t ? t.title : "No thread";
 }
 
-export function query_projectName(model: Model): Uint8Array {
+export function query_projectName(model: Model): string {
   const p = query_selectedProject(model);
-  return p ? p.name : asciiBytes("Wall-E");
+  return p ? p.name : "Wall-E";
 }
 
-export function query_filePath(model: Model): Uint8Array {
+export function query_filePath(model: Model): string {
   const f = query_selectedFile(model);
-  return f ? f.path : asciiBytes("");
+  return f ? f.path : "";
 }
 
-export function query_fileDiff(model: Model): Uint8Array {
+export function query_fileDiff(model: Model): string {
   const f = query_selectedFile(model);
-  return f ? f.diff : asciiBytes("");
+  return f ? f.diff : "";
 }
 
-export function query_fileLanguage(model: Model): Uint8Array {
-  const f = query_selectedFile(model);
-  return f ? f.language : asciiBytes("diff");
-}
-
-export function query_draftText(model: Model): Uint8Array {
-  return model.draft.bytes;
+export function query_draftText(model: Model): string {
+  return model.draft.text;
 }
 
 export function query_messageCount(model: Model): number {
@@ -104,17 +93,17 @@ export function query_fileCount(model: Model): number {
   return query_files(model).length;
 }
 
-export function query_threadStatusLabel(model: Model): Uint8Array {
+export function query_threadStatusLabel(model: Model): string {
   const t = query_selectedThread(model);
-  return t ? t.statusLabel : asciiBytes("");
+  return t ? t.statusLabel : "";
 }
 
-export function query_additionsLabel(model: Model): Uint8Array {
+export function query_additionsLabel(model: Model): string {
   const f = query_selectedFile(model);
-  return f ? f.additionsLabel : asciiBytes("");
+  return f ? f.additionsLabel : "";
 }
 
-export function query_deletionsLabel(model: Model): Uint8Array {
+export function query_deletionsLabel(model: Model): string {
   const f = query_selectedFile(model);
-  return f ? f.deletionsLabel : asciiBytes("");
+  return f ? f.deletionsLabel : "";
 }

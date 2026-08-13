@@ -1,7 +1,6 @@
-// Shell domain types — app-core subset only.
-// Dynamic text is Uint8Array (bytes). Views bind them; markup never imports this file.
+// Shell domain types — pure data for the Electron/React host.
 
-/** String-literal unions become Zig enums — no hyphens, no keyword members. */
+/** String-literal unions for thread lifecycle. */
 export type ThreadStatus = "idle" | "running" | "needs_review" | "failed" | "completed";
 
 export type MessageRole = "user" | "assistant" | "system";
@@ -17,52 +16,49 @@ export type FileChangeStatus = "added" | "modified" | "deleted" | "renamed";
 
 export interface ToolActivity {
   readonly id: number;
-  readonly name: Uint8Array;
+  readonly name: string;
   readonly state: ToolState;
-  readonly inputSummary: Uint8Array;
-  readonly outputSummary: Uint8Array;
-  readonly errorText: Uint8Array;
+  readonly inputSummary: string;
+  readonly outputSummary: string;
+  readonly errorText: string;
 }
 
 export interface Message {
   readonly id: number;
   readonly role: MessageRole;
-  /** View-friendly flag so markup can branch without string compares. */
+  /** View-friendly flag so UI can branch without string compares. */
   readonly isUser: boolean;
-  readonly content: Uint8Array;
+  readonly content: string;
   readonly tools: readonly ToolActivity[];
-  /** tools.length, for markup (nested for-each on m.tools is not allowed). */
   readonly toolCount: number;
 }
 
 export interface FileChange {
   readonly id: number;
-  readonly path: Uint8Array;
+  readonly path: string;
   readonly status: FileChangeStatus;
-  readonly language: Uint8Array;
-  readonly diff: Uint8Array;
+  readonly language: string;
+  readonly diff: string;
   readonly additions: number;
   readonly deletions: number;
-  /** Preformatted "+N" / "-N" for review chrome (ASCII bytes). */
-  readonly additionsLabel: Uint8Array;
-  readonly deletionsLabel: Uint8Array;
+  readonly additionsLabel: string;
+  readonly deletionsLabel: string;
 }
 
 export interface Thread {
   readonly id: number;
-  readonly title: Uint8Array;
+  readonly title: string;
   readonly status: ThreadStatus;
-  /** Short status for list rows (ASCII bytes). */
-  readonly statusLabel: Uint8Array;
+  readonly statusLabel: string;
   readonly messages: readonly Message[];
   readonly fileChanges: readonly FileChange[];
 }
 
 export interface Project {
   readonly id: number;
-  readonly name: Uint8Array;
-  readonly path: Uint8Array;
-  readonly description: Uint8Array;
+  readonly name: string;
+  readonly path: string;
+  readonly description: string;
   readonly threads: readonly Thread[];
 }
 

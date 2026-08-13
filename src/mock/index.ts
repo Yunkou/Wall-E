@@ -1,5 +1,4 @@
-// Mock data surface for the Native core.
-// Views (app.native) must not import this package — only core.ts does.
+// Mock data surface for the shell.
 
 export type {
   FileChange,
@@ -13,7 +12,7 @@ export type {
   ToolActivity,
   ToolState,
   Workspace,
-} from "./types.ts";
+} from "./types";
 
 export {
   defaultSelection,
@@ -27,6 +26,6 @@ export {
   threadFiles,
   threadMessages,
   NONE,
-} from "./selection.ts";
+} from "./selection";
 
-export { MOCK_PROJECTS, MOCK_SEED } from "./fixtures.ts";
+export { MOCK_PROJECTS, MOCK_SEED } from "./fixtures";

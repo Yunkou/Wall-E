@@ -1,0 +1,161 @@
+/* Import order matters for HeroUI Pro */
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "@heroui-pro/react/css";
+@import "./themes/uber.css" layer(theme);
+
+/* App shell layout (Uber desktop agent) */
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  /* Let Electron vibrancy / acrylic show through */
+  background: transparent !important;
+}
+
+body {
+  @apply text-foreground antialiased;
+  font-family:
+    "Inter",
+    "SF Pro Text",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* Frosted glass panels: translucent fills over native window blur */
+[data-testid="app-shell"],
+[data-testid="app-shell"] > * {
+  height: 100%;
+  background: transparent;
+}
+
+[data-testid="session-sidebar"],
+[data-testid="agent-navbar"],
+[data-testid="review-pane"],
+[data-testid="compose-bar"],
+[data-testid="conversation-pane"] > .border-b {
+  background: color-mix(in oklab, var(--surface) 58%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(1.35);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
+}
+
+[data-testid="conversation-pane"] {
+  background: color-mix(in oklab, var(--background) 42%, transparent) !important;
+}
+
+[data-theme="uber-dark"] [data-testid="session-sidebar"],
+[data-theme="uber-dark"] [data-testid="agent-navbar"],
+[data-theme="uber-dark"] [data-testid="review-pane"],
+[data-theme="uber-dark"] [data-testid="compose-bar"],
+[data-theme="uber-dark"] [data-testid="conversation-pane"] > .border-b {
+  background: color-mix(in oklab, var(--surface) 48%, transparent) !important;
+}
+
+[data-theme="uber-dark"] [data-testid="conversation-pane"] {
+  background: color-mix(in oklab, var(--background) 35%, transparent) !important;
+}
+
+/* Electron drag regions */
+.titlebar {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar .no-drag,
+.titlebar button,
+.titlebar [role="button"],
+.titlebar a {
+  -webkit-app-region: no-drag;
+}
+
+/* Diff viewer */
+.diff-line-add {
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success);
+}
+
+.diff-line-del {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.diff-line-meta {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--default) 60%, transparent);
+}
+
+.diff-gutter {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 0.4rem;
+  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  vertical-align: top;
+}
+
+.diff-code {
+  width: 100%;
+}
+
+/* Breadcrumb: allow items to shrink so long titles truncate (HeroUI defaults to shrink-0). */
+[data-testid="breadcrumbs"] .breadcrumbs__item {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* Stronger panel seams between sidebar / main / aside */
+[data-testid="session-sidebar"] {
+  box-shadow: inset -1px 0 0 var(--border);
+}
+
+[data-testid="review-pane"] {
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+/* Session status chip column alignment */
+[data-testid="session-list"] [data-slot="chip"] {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Composer */
+.compose-textarea {
+  field-sizing: content;
+  min-height: 64px;
+  max-height: 160px;
+  resize: vertical;
+}
+
+/* Pane resizer */
+.pane-resizer {
+  width: 4px;
+  cursor: col-resize;
+  flex-shrink: 0;
+  background: transparent;
+  position: relative;
+}
+
+.pane-resizer::after {
+  content: "";
+  position: absolute;
+  inset: 0 -2px;
+}
+
+.pane-resizer:hover,
+.pane-resizer.active {
+  background: var(--accent);
+  opacity: 0.35;
+}
+
+/* GSAP-friendly will-change targets */
+.shell-list-item {
+  will-change: transform, background-color;
+}
+
+.shell-message {
+  will-change: opacity, transform;
+}

@@ -1,0 +1,138 @@
+/**
+ * Uber theme for HeroUI — monochrome greys, black/white accent, 4px radius.
+ * Ported from the former Native DesignTokens (src/theme/uber.zig).
+ *
+ * Activate:
+ *   <html data-theme="uber" class="light">
+ *   <html data-theme="uber-dark" class="dark">
+ */
+
+@layer theme {
+  /* ---------- Uber Light ---------- */
+  [data-theme="uber"],
+  [data-theme="uber-light"] {
+    color-scheme: light;
+
+    --white: oklch(100% 0 0);
+    --black: oklch(0% 0 0);
+    --snow: oklch(0.9911 0 0);
+    --eclipse: oklch(0.2103 0 0);
+
+    --spacing: 0.25rem;
+    --border-width: 1px;
+    --field-border-width: 1px;
+    --disabled-opacity: 0.5;
+    --ring-offset-width: 2px;
+    --cursor-interactive: pointer;
+    --cursor-disabled: not-allowed;
+
+    /* 4px radius ladder (Uber shell) */
+    --radius: 0.25rem;
+    --field-radius: 0.25rem;
+
+    /* Base */
+    --background: oklch(0.9702 0 0); /* #f5f5f5 */
+    --foreground: oklch(0.2103 0 0); /* #181818 */
+
+    --surface: oklch(100% 0 0);
+    --surface-foreground: var(--foreground);
+
+    --overlay: oklch(100% 0 0);
+    --overlay-foreground: var(--foreground);
+
+    --muted: oklch(0.5517 0 0); /* #727272 */
+
+    --default: oklch(0.9524 0 0); /* #efefef */
+    --default-foreground: var(--foreground);
+
+    /* Accent: black knockout */
+    --accent: oklch(0% 0 0);
+    --accent-foreground: oklch(0.9911 0 0);
+
+    --field-background: oklch(100% 0 0);
+    --field-foreground: var(--foreground);
+    --field-placeholder: var(--muted);
+    --field-border: oklch(0.9 0 0);
+
+    --success: oklch(0.6277 0.1604 153.06); /* #05a357 */
+    --success-foreground: oklch(0.98 0.02 150);
+
+    --warning: oklch(0.8446 0.1525 80.6); /* #ffc043 */
+    --warning-foreground: oklch(0.18 0.04 60);
+
+    --danger: oklch(0.573 0.2249 21.97); /* #de1135 */
+    --danger-foreground: oklch(0.98 0.01 25);
+
+    --segment: oklch(100% 0 0);
+    --segment-foreground: var(--foreground);
+
+    --border: oklch(0.9 0 0); /* #dedede */
+    --separator: oklch(0.9 0 0);
+    --focus: oklch(0% 0 0);
+    --link: var(--accent);
+
+    --surface-shadow:
+      0 1px 2px 0 rgb(0 0 0 / 0.04),
+      0 1px 1px 0 rgb(0 0 0 / 0.03);
+    --overlay-shadow:
+      0 4px 16px 0 rgb(0 0 0 / 0.08),
+      0 8px 24px 0 rgb(0 0 0 / 0.06);
+    --field-shadow: 0 0 0 0 transparent;
+
+    --skeleton-animation: shimmer;
+    --tooltip-delay: 800ms;
+    --tooltip-close-delay: 200ms;
+  }
+
+  /* ---------- Uber Dark ---------- */
+  [data-theme="uber-dark"] {
+    color-scheme: dark;
+
+    --background: oklch(0.12 0 0); /* #060606 */
+    --foreground: oklch(0.9911 0 0); /* #fcfcfc */
+
+    --surface: oklch(0.2103 0 0); /* #181818 */
+    --surface-foreground: var(--foreground);
+
+    --overlay: oklch(0.24 0 0);
+    --overlay-foreground: var(--foreground);
+
+    --muted: oklch(0.705 0 0); /* #a0a0a0 */
+
+    --default: oklch(0.257 0 0); /* #232323 */
+    --default-foreground: var(--foreground);
+
+    /* Accent: porcelain knockout */
+    --accent: oklch(0.9848 0 0); /* #fafafa */
+    --accent-foreground: oklch(0.14 0 0);
+
+    --field-background: oklch(0.257 0 0);
+    --field-foreground: var(--foreground);
+    --field-placeholder: var(--muted);
+    --field-border: oklch(0.28 0 0);
+
+    --success: oklch(0.6514 0.1321 156.22);
+    --success-foreground: oklch(0.14 0.03 150);
+
+    --warning: oklch(0.8803 0.1348 86.06);
+    --warning-foreground: oklch(0.16 0.04 70);
+
+    --danger: oklch(0.7044 0.1872 23.19);
+    --danger-foreground: oklch(0.16 0.04 20);
+
+    --segment: oklch(0.3 0 0);
+    --segment-foreground: var(--foreground);
+
+    --border: oklch(0.28 0 0); /* #292929 */
+    --separator: oklch(0.28 0 0);
+    --focus: oklch(0.9848 0 0);
+    --link: var(--accent);
+
+    --surface-shadow: 0 0 0 0 transparent;
+    --overlay-shadow: 0 0 0 1px oklch(1 0 0 / 0.06);
+    --field-shadow: 0 0 0 0 transparent;
+
+    --radius: 0.25rem;
+    --field-radius: 0.25rem;
+  }
+}

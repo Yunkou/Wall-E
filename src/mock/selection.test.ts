@@ -5,74 +5,81 @@ import {
   selectFile,
   selectProject,
   selectThread,
+  threadFiles,
   threadMessages,
   NONE,
-} from "./selection.ts";
-import type { Project, Workspace } from "./types.ts";
-
-function b(s: string): Uint8Array {
-  return new TextEncoder().encode(s);
-}
+} from "./selection";
+import { MOCK_PROJECTS } from "./fixtures";
+import type { Project, Workspace } from "./types";
 
 function sampleWorkspace(): Workspace {
   const projects: Project[] = [
     {
       id: 1,
-      name: b("Alpha"),
-      path: b("/a"),
-      description: b("d1"),
+      name: "Alpha",
+      path: "/a",
+      description: "d1",
       threads: [
         {
           id: 10,
-          title: b("T1"),
+          title: "T1",
           status: "idle",
-          statusLabel: b("Idle"),
+          statusLabel: "Idle",
           messages: [
-            { id: 100, role: "user", isUser: true, content: b("hello-alpha"), tools: [], toolCount: 0 },
-            { id: 101, role: "assistant", isUser: false, content: b("reply-alpha"), tools: [], toolCount: 0 },
+            { id: 100, role: "user", isUser: true, content: "hello-alpha", tools: [], toolCount: 0 },
+            {
+              id: 101,
+              role: "assistant",
+              isUser: false,
+              content: "reply-alpha",
+              tools: [],
+              toolCount: 0,
+            },
           ],
           fileChanges: [
             {
               id: 1000,
-              path: b("src/a.ts"),
+              path: "src/a.ts",
               status: "modified",
-              language: b("typescript"),
-              diff: b("diff --git a/src/a.ts b/src/a.ts\n+const x = 1;"),
+              language: "typescript",
+              diff: "diff --git a/src/a.ts b/src/a.ts\n+const x = 1;",
               additions: 1,
               deletions: 0,
-              additionsLabel: b("+1"),
-              deletionsLabel: b("-0"),
+              additionsLabel: "+1",
+              deletionsLabel: "-0",
             },
           ],
         },
         {
           id: 11,
-          title: b("T2"),
+          title: "T2",
           status: "needs_review",
-          statusLabel: b("Review"),
-          messages: [{ id: 110, role: "user", isUser: true, content: b("hello-t2"), tools: [], toolCount: 0 }],
+          statusLabel: "Review",
+          messages: [
+            { id: 110, role: "user", isUser: true, content: "hello-t2", tools: [], toolCount: 0 },
+          ],
           fileChanges: [
             {
               id: 1100,
-              path: b("src/b.ts"),
+              path: "src/b.ts",
               status: "added",
-              language: b("typescript"),
-              diff: b("diff --git a/src/b.ts b/src/b.ts\n+export {};"),
+              language: "typescript",
+              diff: "diff --git a/src/b.ts b/src/b.ts\n+export {};",
               additions: 1,
               deletions: 0,
-              additionsLabel: b("+1"),
-              deletionsLabel: b("-0"),
+              additionsLabel: "+1",
+              deletionsLabel: "-0",
             },
             {
               id: 1101,
-              path: b("src/c.ts"),
+              path: "src/c.ts",
               status: "deleted",
-              language: b("typescript"),
-              diff: b("diff --git a/src/c.ts b/src/c.ts\n-old"),
+              language: "typescript",
+              diff: "diff --git a/src/c.ts b/src/c.ts\n-old",
               additions: 0,
               deletions: 1,
-              additionsLabel: b("+0"),
-              deletionsLabel: b("-1"),
+              additionsLabel: "+0",
+              deletionsLabel: "-1",
             },
           ],
         },
@@ -80,16 +87,18 @@ function sampleWorkspace(): Workspace {
     },
     {
       id: 2,
-      name: b("Beta"),
-      path: b("/b"),
-      description: b("d2"),
+      name: "Beta",
+      path: "/b",
+      description: "d2",
       threads: [
         {
           id: 20,
-          title: b("Beta thread"),
+          title: "Beta thread",
           status: "running",
-          statusLabel: b("Running"),
-          messages: [{ id: 200, role: "user", isUser: true, content: b("hello-beta"), tools: [], toolCount: 0 }],
+          statusLabel: "Running",
+          messages: [
+            { id: 200, role: "user", isUser: true, content: "hello-beta", tools: [], toolCount: 0 },
+          ],
           fileChanges: [],
         },
       ],
@@ -116,7 +125,7 @@ describe("selection helpers (shipped)", () => {
     expect(sel.threadId).toBe(11);
     const msgs = threadMessages(ws, 1, 11);
     expect(msgs).toHaveLength(1);
-    expect(new TextDecoder().decode(msgs[0]!.content)).toBe("hello-t2");
+    expect(msgs[0]!.content).toBe("hello-t2");
   });
 
   it("selecting a file yields that file diff", () => {
@@ -127,8 +136,8 @@ describe("selection helpers (shipped)", () => {
     expect(sel.fileId).toBe(1101);
     const file = findFile(ws, 1, 11, 1101);
     expect(file).not.toBeNull();
-    expect(new TextDecoder().decode(file!.path)).toBe("src/c.ts");
-    expect(new TextDecoder().decode(file!.diff)).toContain("diff --git");
+    expect(file!.path).toBe("src/c.ts");
+    expect(file!.diff).toContain("diff --git");
     expect(file!.diff.length).toBeGreaterThan(0);
   });
 
@@ -136,5 +145,77 @@ describe("selection helpers (shipped)", () => {
     const ws = sampleWorkspace();
     const sel = selectProject(ws, 999);
     expect(sel.projectId).toBe(NONE);
+  });
+});
+
+describe("selection against shipped faker fixtures", () => {
+  const ws: Workspace = { projects: MOCK_PROJECTS };
+
+  it("defaultSelection lands on real fixture content", () => {
+    const sel = defaultSelection(ws);
+    expect(sel.projectId).toBeGreaterThan(0);
+    expect(sel.threadId).toBeGreaterThan(0);
+    const msgs = threadMessages(ws, sel.projectId, sel.threadId);
+    expect(msgs.length).toBeGreaterThan(0);
+    const files = threadFiles(ws, sel.projectId, sel.threadId);
+    // Prefer thread with files when available in fixtures.
+    if (files.length > 0) {
+      expect(sel.fileId).toBeGreaterThan(0);
+      const file = findFile(ws, sel.projectId, sel.threadId, sel.fileId);
+      expect(file?.diff).toContain("diff --git");
+    }
+  });
+
+  it("switching projects keeps messages/files bound to the new selection", () => {
+    expect(MOCK_PROJECTS.length).toBeGreaterThanOrEqual(2);
+    const a = MOCK_PROJECTS[0]!;
+    const b = MOCK_PROJECTS[1]!;
+    const selA = selectProject(ws, a.id);
+    const selB = selectProject(ws, b.id);
+    expect(selA.projectId).toBe(a.id);
+    expect(selB.projectId).toBe(b.id);
+    expect(selA.threadId).not.toBe(0);
+    expect(selB.threadId).not.toBe(0);
+
+    const msgsA = threadMessages(ws, selA.projectId, selA.threadId);
+    const msgsB = threadMessages(ws, selB.projectId, selB.threadId);
+    expect(msgsA.length).toBeGreaterThan(0);
+    expect(msgsB.length).toBeGreaterThan(0);
+    // Different projects must not share the same thread identity.
+    expect(selA.threadId).not.toBe(selB.threadId);
+
+    const threadB = b.threads.find((t) => t.id === selB.threadId);
+    expect(threadB).toBeDefined();
+    expect(msgsB.map((m) => m.id)).toEqual(threadB!.messages.map((m) => m.id));
+  });
+
+  it("selectFile within a multi-file thread yields that fixture diff only", () => {
+    let projectId = 0;
+    let threadId = 0;
+    let fileA = 0;
+    let fileB = 0;
+    for (const p of MOCK_PROJECTS) {
+      for (const t of p.threads) {
+        if (t.fileChanges.length >= 2) {
+          projectId = p.id;
+          threadId = t.id;
+          fileA = t.fileChanges[0]!.id;
+          fileB = t.fileChanges[1]!.id;
+          break;
+        }
+      }
+      if (fileB) break;
+    }
+    expect(fileB).toBeGreaterThan(0);
+
+    const sel1 = selectFile(ws, projectId, threadId, fileA);
+    const sel2 = selectFile(ws, projectId, threadId, fileB);
+    expect(sel1.fileId).toBe(fileA);
+    expect(sel2.fileId).toBe(fileB);
+    const f1 = findFile(ws, projectId, threadId, fileA)!;
+    const f2 = findFile(ws, projectId, threadId, fileB)!;
+    expect(f1.path).not.toBe(f2.path);
+    expect(f1.diff).not.toBe(f2.diff);
+    expect(f2.diff).toContain("diff --git");
   });
 });

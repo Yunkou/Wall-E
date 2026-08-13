@@ -1,8 +1,6 @@
 // Theme preference helpers — pure, no host I/O.
 
-import { asciiBytes } from "@native-sdk/core";
-import type { ColorScheme } from "@native-sdk/core/events";
-import type { Model, ThemeMode } from "../core.ts";
+import type { ColorScheme, Model, ThemeMode } from "./model";
 
 export function theme_effectiveScheme(mode: ThemeMode, system: ColorScheme): ColorScheme {
   if (mode === "system") return system;
@@ -36,16 +34,9 @@ export function theme_isThemeDark(model: Model): boolean {
   return model.themeMode === "dark";
 }
 
-export function theme_schemeLabel(model: Model): Uint8Array {
+export function theme_schemeLabel(model: Model): string {
   if (model.themeMode === "system") {
-    return model.systemScheme === "dark"
-      ? asciiBytes("Auto · Dark")
-      : asciiBytes("Auto · Light");
+    return model.systemScheme === "dark" ? "Auto · Dark" : "Auto · Light";
   }
-  return model.colorScheme === "dark" ? asciiBytes("Dark") : asciiBytes("Light");
-}
-
-export function theme_schemeIcon(model: Model): Uint8Array {
-  // Lucide via app: namespace (see src/theme/lucide_icons.zig).
-  return model.colorScheme === "dark" ? asciiBytes("app:moon") : asciiBytes("app:sun");
+  return model.colorScheme === "dark" ? "Dark" : "Light";
 }

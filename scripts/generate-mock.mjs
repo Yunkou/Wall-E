@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
- * Generates src/mock/fixtures.ts — pure app-core subset data.
+ * Generates src/mock/fixtures.ts — pure domain data with string fields.
  *
- * Faker runs only here (Node). The Native core imports the emitted
- * fixtures; it never depends on @faker-js/faker or any npm package.
+ * Faker runs only here (Node). The app imports the emitted fixtures.
  * Re-run: node scripts/generate-mock.mjs
  */
 import { writeFileSync, mkdirSync } from "node:fs";
@@ -28,7 +27,6 @@ const TOOL_NAMES = [
   "list_dir",
   "web_search",
 ];
-// ToolState members must be Zig-safe identifiers (no hyphens / keywords).
 const FILE_EXTS = [
   { ext: "ts", language: "typescript" },
   { ext: "tsx", language: "tsx" },
@@ -38,7 +36,7 @@ const FILE_EXTS = [
   { ext: "md", language: "markdown" },
 ];
 
-/** Escape a JS string for embedding in a double-quoted asciiBytes("...") call. */
+/** Escape a JS string for embedding in a double-quoted literal. */
 function esc(s) {
   return s
     .replace(/\\/g, "\\\\")
@@ -52,7 +50,7 @@ function toAscii(s) {
   return String(s).replace(/[^\x00-\x7F]/g, "?");
 }
 function b(s) {
-  return `asciiBytes("${esc(toAscii(s))}")`;
+  return `"${esc(toAscii(s))}"`;
 }
 
 let nextId = 1;
@@ -106,14 +104,20 @@ function makeTool() {
   return { id: toolId, name, state, inputSummary, outputSummary, errorText };
 }
 
-function makeMessages(count) {
+function makeMessages(count, { forceTools = false } = {}) {
   const messages = [];
+  let toolsEmitted = 0;
   for (let i = 0; i < count; i++) {
     const role = i % 2 === 0 ? "user" : "assistant";
-    const tools =
-      role === "assistant" && i % 3 === 1
-        ? Array.from({ length: faker.number.int({ min: 1, max: 2 }) }, () => makeTool())
-        : [];
+    // Attach tools on assistant turns often enough for the conversation pane
+    // to surface tool-activity rows; force at least one when requested.
+    const wantTools =
+      role === "assistant" &&
+      (i % 2 === 1 || (forceTools && toolsEmitted === 0 && i === count - 1) || (forceTools && i === 1));
+    const tools = wantTools
+      ? Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => makeTool())
+      : [];
+    if (tools.length > 0) toolsEmitted += tools.length;
     const content =
       role === "user"
         ? faker.helpers.arrayElement([
@@ -131,6 +135,15 @@ function makeMessages(count) {
       tools,
       toolCount: tools.length,
     });
+  }
+  // Guarantee at least one tool row when forceTools and we still have none.
+  if (forceTools && toolsEmitted === 0) {
+    const assistant = messages.find((m) => m.role === "assistant");
+    if (assistant) {
+      const tools = [makeTool(), makeTool()];
+      assistant.tools = tools;
+      assistant.toolCount = tools.length;
+    }
   }
   return messages;
 }
@@ -168,10 +181,11 @@ const STATUS_LABELS = {
   completed: "Done",
 };
 
-function makeThread(index) {
-  const status = THREAD_STATUSES[index % THREAD_STATUSES.length];
+function makeThread(index, { status: forcedStatus, forceTools = false } = {}) {
+  // Prefer explicit status so the workspace always covers full lifecycle chips.
+  const status = forcedStatus ?? THREAD_STATUSES[index % THREAD_STATUSES.length];
   const messageCount = faker.number.int({ min: 2, max: 6 });
-  // Always give at least one thread in a project file changes for Review pane demos.
+  // Review / completed threads always carry file changes + diffs for the review pane.
   const fileCount =
     status === "needs_review" || status === "completed" || index % 2 === 0
       ? faker.number.int({ min: 2, max: 5 })
@@ -186,7 +200,9 @@ function makeThread(index) {
     ]),
     status,
     statusLabel: STATUS_LABELS[status] || status,
-    messages: makeMessages(messageCount),
+    messages: makeMessages(messageCount, {
+      forceTools: forceTools || status === "running" || status === "needs_review",
+    }),
     fileChanges: makeFileChanges(fileCount),
   };
 }
@@ -196,18 +212,56 @@ function makeProject(index) {
     index === 0
       ? "Wall-E"
       : `${faker.helpers.arrayElement(["codex-shell", "agent-runtime", "desktop-kit", "pi-bridge"])}-${index + 1}`;
-  const threadCount = faker.number.int({ min: 2, max: 4 });
+  // ≥3 threads; first two forced content-rich (tools + review files).
+  const baseStatuses = [
+    THREAD_STATUSES[index % THREAD_STATUSES.length],
+    "needs_review",
+    THREAD_STATUSES[(index + 2) % THREAD_STATUSES.length],
+  ];
+  const extra = faker.number.int({ min: 0, max: 1 });
+  const threads = baseStatuses.map((status, i) =>
+    makeThread(index * 5 + i, {
+      status,
+      forceTools: i === 0 || status === "needs_review",
+    }),
+  );
+  for (let i = 0; i < extra; i++) {
+    threads.push(
+      makeThread(index * 5 + baseStatuses.length + i, {
+        status: THREAD_STATUSES[(index + 3 + i) % THREAD_STATUSES.length],
+      }),
+    );
+  }
   return {
     id: id(),
     name,
     path: `/Users/demo/Project/${name}`,
     description: faker.company.catchPhrase(),
-    threads: Array.from({ length: threadCount }, (_, i) => makeThread(i + index * 3)),
+    threads,
   };
 }
 
-const projectCount = faker.number.int({ min: 2, max: 3 });
+// Always ≥2 projects so project selection is exerciseable in the UI and tests.
+// After building projects, ensure every lifecycle status appears at least once.
+const projectCount = Math.max(2, faker.number.int({ min: 2, max: 3 }));
 const projects = Array.from({ length: projectCount }, (_, i) => makeProject(i));
+
+{
+  const seen = new Set();
+  for (const p of projects) {
+    for (const t of p.threads) seen.add(t.status);
+  }
+  for (const status of THREAD_STATUSES) {
+    if (seen.has(status)) continue;
+    // Graft a missing status onto the last project as an extra session.
+    const host = projects[projects.length - 1];
+    host.threads = [
+      ...host.threads,
+      makeThread(900 + seen.size, { status, forceTools: true }),
+    ];
+    seen.add(status);
+  }
+}
 
 function emitTool(t) {
   return `      {
@@ -277,10 +331,9 @@ ${p.threads.map(emitThread).join(",\n")}
 
 const body = `// AUTO-GENERATED by scripts/generate-mock.mjs — do not edit by hand.
 // Seed: ${SEED}. Re-run: node scripts/generate-mock.mjs
-// Faker lives only in the generator; this file is pure app-core subset data.
+// Faker lives only in the generator; this file is pure domain data.
 
-import { asciiBytes } from "@native-sdk/core";
-import type { Project } from "./types.ts";
+import type { Project } from "./types";
 
 export const MOCK_SEED = ${SEED} as const;
 
